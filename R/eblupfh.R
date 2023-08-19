@@ -3,26 +3,55 @@
 #' @description This function gives the EBLUP (or EB predictor under normality) based on a Fay-Herriot model.
 #'
 #' @references
-#' - Rao, J. N., & Molina, I. (2015). Small area estimation. John Wiley & Sons.
-#' - Anisa, R., Kurnia, A., & Indahwati, I. (2013). Cluster information of non-sampled area in small area estimation. E-Prosiding Internasional| Departemen Statistika FMIPA Universitas Padjadjaran, 1(1), 69-76.
+#' \enumerate{
+#'  \item Rao, J. N., & Molina, I. (2015). Small area estimation. John Wiley & Sons.
+#'  \item Anisa, R., Kurnia, A., & Indahwati, I. (2013). Cluster information of non-sampled area in small area estimation. E-Prosiding Internasional| Departemen Statistika FMIPA Universitas Padjadjaran, 1(1), 69-76.
+#' }
 #'
 #' @param formula an object of class formula that contains a description of the model to be fitted. The variables included in the formula must be contained in the data.
 #' @param data a data frame or a data frame extension (e.g. a tibble)
-#' @param vardir vector or column names from data that contain variance sampling from the direct estimator for each domain.
+#' @param vardir vector or column names from data that contain variance sampling from the direct estimator for each area
 #' @param cluster vector or column name from data that contain cluster information.
 #' @param method Fitting method can be chosen between 'ML' and 'REML'
 #' @param maxiter maximum number of iterations allowed in the Fisher-scoring algorithm. Default is 100 iterations.
 #' @param precision convergence tolerance limit for the Fisher-scoring algorithm. Default value is 0.0001.
-#' @param scale scaling auxiliary variable or not. Default value is FALSE
-#' @param print_result print coefficient or not. Default value is TRUE
+#' @param scale scaling auxiliary variable or not, default value is FALSE
+#' @param print_result print coefficient or not, default value is TRUE
 #'
-#' @return List contains data.frame result,
+#' @returns The function returns a list with the following objects (\code{df_res} and \code{fit}): \tabular{ll}{
+#' \code{df_res} a data frame that contains the following columns: \cr
+#'    * \code{y} variable response \cr
+#'    * \code{eblup} estimated results for each area \cr
+#'    * \code{random_effect} random effect for each area \cr
+#'    * \code{vardir} variance sampling from the direct estimator for each area \cr
+#'    * \code{mse} Mean Square Error \cr
+#'    * \code{cluster} cluster information for each area \cr
+#'    * \code{rse} Relative Standart Error (%) \cr
+#'
+#' \code{fit} a list containing the following objects: \cr
+#'    * \code{estcoef} a data frame with the estimated model coefficients in the first column (beta),
+#'    their asymptotic standard errors in the second column (std.error),
+#'    the t-statistics in the third column (tvalue) and the p-values of the significance of each coefficient
+#'    in last column (pvalue) \cr
+#'    * \code{model_formula} model formula applied \cr
+#'    * \code{method} type of fitting method applied (`ML` or `REML`) \cr
+#'    * \code{random_effect_var} estimated random effect variance \cr
+#'    * \code{convergence} logical value that indicates the Fisher-scoring algorithm has converged or not \cr
+#'    * \code{n_iter} number of iterations performed by the Fisher-scoring algorithm. \cr
+#'    * \code{goodness} vector containing several goodness-of-fit measures: loglikehood, AIC, and BIC \cr
+#' }
+#'
+#' @details
+#' The model has a form that is response ~ auxiliary variables.
+#' where numeric type response variables can contain NA.
+#' When the response variable contains NA it will be estimated with cluster information.
 #'
 #' @examples
 #' model1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = "var")
 #' model1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = ~var)
 #' model2 <- eblupfh(y ~ x1 + x2 + x3, data = mys, vardir = "var", cluster = "clust")
-#'
+#' @md
+
 eblupfh <- function(formula, data, vardir, cluster, method = "REML",
                     maxiter = 100, precision = 1e-04, scale = FALSE,
                     print_result = TRUE) {
@@ -87,11 +116,6 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
   if (any(is.na(X))) {
     cli::cli_abort("Auxiliary variabels contains NA values.")
   }
-  # if (any(is.na(y))) {
-  #   formuladata <- model.frame(formula, datas, na.action = na.omit)
-  #   X <- model.matrix(formula, datas)
-  #   y <- as.matrix(formuladata[1])
-  # }
 
   # inisialisasi untuk output
   result <- list(
@@ -100,7 +124,7 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
       estcoef = NA,
       model_formula = formula,
       method = method,
-      var_random_effect = NA,
+      random_effect_var = NA,
       convergence = TRUE,
       n_iter = 0,
       goodness = NA
@@ -184,7 +208,7 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
   }
 
   sigma2_u <- max(sigma2_u[k + 1], 0)
-  result$fit$var_random_effect <- sigma2_u
+  result$fit$random_effect_var <- sigma2_u
 
   # jika tidak konvergen
   if (k >= maxiter && diff >= precision) {
@@ -246,6 +270,12 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
       mse2d[d] <- g1d[d] + g2d[d] + 2 * g3d[d]
     }
   }
+  # MSE with matrix -----------------------------------
+  # g1 <- G - G %*% t(Z) %*% Vi %*% Z %*% G
+  # aT <- Z %*% G %*% t(Z) %*% Vi
+  # dT <- X - aT %*% X
+  # g2 <- dT %*% solve(Xt %*% Vi %*% X) %*% t(dT)
+  # g2 <- dT %*% Q %*% t(dT)
 
   df_res[!nonsample, "random_effect"] <- u
   df_res[!nonsample, "eblup"] <- eblup_est
@@ -318,6 +348,11 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
 }
 
 
+
+
+
+# Fungsi Penolong ---------------------------------------------------------
+
 # extract variable from data frame
 .get_variable <- function(data, variable) {
   if (length(variable) == nrow(data)) {
@@ -344,9 +379,4 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
 }
 
 
-# MSE with matrix -----------------------------------
-# g1 <- G - G %*% t(Z) %*% Vi %*% Z %*% G
-# aT <- Z %*% G %*% t(Z) %*% Vi
-# dT <- X - aT %*% X
-# g2 <- dT %*% solve(Xt %*% Vi %*% X) %*% t(dT)
-# g2 <- dT %*% Q %*% t(dT)
+

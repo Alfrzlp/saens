@@ -21,7 +21,7 @@ eblupfh(
 
 \item{data}{a data frame or a data frame extension (e.g. a tibble)}
 
-\item{vardir}{vector or column names from data that contain variance sampling from the direct estimator for each domain.}
+\item{vardir}{vector or column names from data that contain variance sampling from the direct estimator for each area}
 
 \item{cluster}{vector or column name from data that contain cluster information.}
 
@@ -31,23 +31,54 @@ eblupfh(
 
 \item{precision}{convergence tolerance limit for the Fisher-scoring algorithm. Default value is 0.0001.}
 
-\item{scale}{scaling auxiliary variable or not. Default value is FALSE}
+\item{scale}{scaling auxiliary variable or not, default value is FALSE}
 
-\item{print_result}{print coefficient or not. Default value is TRUE}
+\item{print_result}{print coefficient or not, default value is TRUE}
 }
 \value{
-List contains data.frame result,
+The function returns a list with the following objects (\code{df_res} and \code{fit}): \tabular{ll}{
+\code{df_res} a data frame that contains the following columns: \cr
+\itemize{
+\item \code{y} variable response \cr
+\item \code{eblup} estimated results for each area \cr
+\item \code{random_effect} random effect for each area \cr
+\item \code{vardir} variance sampling from the direct estimator for each area \cr
+\item \code{mse} Mean Square Error \cr
+\item \code{cluster} cluster information for each area \cr
+\item \code{rse} Relative Standart Error (\%) \cr
+}
+
+\code{fit} a list containing the following objects: \cr
+\itemize{
+\item \code{estcoef} a data frame with the estimated model coefficients in the first column (beta),
+their asymptotic standard errors in the second column (std.error),
+the t-statistics in the third column (tvalue) and the p-values of the significance of each coefficient
+in last column (pvalue) \cr
+\item \code{model_formula} model formula applied \cr
+\item \code{method} type of fitting method applied (\code{ML} or \code{REML}) \cr
+\item \code{random_effect_var} estimated random effect variance \cr
+\item \code{convergence} logical value that indicates the Fisher-scoring algorithm has converged or not \cr
+\item \code{n_iter} number of iterations performed by the Fisher-scoring algorithm. \cr
+\item \code{goodness} vector containing several goodness-of-fit measures: loglikehood, AIC, and BIC \cr
+}
+}
 }
 \description{
 This function gives the EBLUP (or EB predictor under normality) based on a Fay-Herriot model.
 }
+\details{
+The model has a form that is response ~ auxiliary variables.
+where numeric type response variables can contain NA.
+When the response variable contains NA it will be estimated with cluster information.
+}
 \examples{
-model1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = 'var')
-model1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = ~ var)
-model2 <- eblupfh(y ~ x1 + x2 + x3, data = mys, vardir = 'var', cluster = 'clust')
-
+model1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = "var")
+model1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = ~var)
+model2 <- eblupfh(y ~ x1 + x2 + x3, data = mys, vardir = "var", cluster = "clust")
 }
 \references{
-- Rao, J. N., & Molina, I. (2015). Small area estimation. John Wiley & Sons.
-- Anisa, R., Kurnia, A., & Indahwati, I. (2013). Cluster information of non-sampled area in small area estimation. E-Prosiding Internasional| Departemen Statistika FMIPA Universitas Padjadjaran, 1(1), 69-76.
+\enumerate{
+\item Rao, J. N., & Molina, I. (2015). Small area estimation. John Wiley & Sons.
+\item Anisa, R., Kurnia, A., & Indahwati, I. (2013). Cluster information of non-sampled area in small area estimation. E-Prosiding Internasional| Departemen Statistika FMIPA Universitas Padjadjaran, 1(1), 69-76.
+}
 }
