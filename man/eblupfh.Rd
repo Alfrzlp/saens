@@ -72,9 +72,14 @@ where numeric type response variables can contain NA.
 When the response variable contains NA it will be estimated with cluster information.
 }
 \examples{
-model1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = "var")
-model1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = ~var)
-model2 <- eblupfh(y ~ x1 + x2 + x3, data = mys, vardir = "var", cluster = "clust")
+library(saens)
+
+# model 1
+m1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = "var")
+m1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = ~var)
+
+# model 2
+m2 <- eblupfh(y ~ x1 + x2 + x3, data = mys, vardir = "var", cluster = "clust")
 }
 \references{
 \enumerate{

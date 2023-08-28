@@ -46,10 +46,16 @@
 #' where numeric type response variables can contain NA.
 #' When the response variable contains NA it will be estimated with cluster information.
 #'
+#' @export
 #' @examples
-#' model1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = "var")
-#' model1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = ~var)
-#' model2 <- eblupfh(y ~ x1 + x2 + x3, data = mys, vardir = "var", cluster = "clust")
+#' library(saens)
+#'
+#' # model 1
+#' m1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = "var")
+#' m1 <- eblupfh(y ~ x1 + x2 + x3, data = na.omit(mys), vardir = ~var)
+#'
+#' # model 2
+#' m2 <- eblupfh(y ~ x1 + x2 + x3, data = mys, vardir = "var", cluster = "clust")
 #' @md
 
 eblupfh <- function(formula, data, vardir, cluster, method = "REML",
@@ -99,9 +105,9 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
   y <- as.matrix(formuladata[1])
 
   if (scale) {
-    my_scale <- apply(X, 2, stats::sd, na.rm = TRUE)
-    my_center <- apply(X, 2, base::mean, na.rm = TRUE)
     X <- scale(X)
+    my_scale <- attr(X, "scaled:scale")
+    my_center <- attr(X, "scaled:center")
   }
 
   # Cek pilihan metode
@@ -291,8 +297,9 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
     m_ns <- sum(nonsample)
     # Xns <- model.matrix(formula, datans)
     Xns <- stats::model.matrix(formula, stats::model.frame(~., datans, na.action = stats::na.pass))
-    if (scale) Xns <- scale(Xns, center = my_center, scale = my_scale)
-
+    if (scale) {
+      Xns <- scale(Xns, center = my_center, scale = my_scale)
+    }
     Xbeta_ns <- Xns %*% BETA
 
     u_ns <- .get_value(u, clust, nonsample)
@@ -365,9 +372,7 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
     # extract column name (class character) from formula
     variable <- data[[all.vars(variable)]]
   } else {
-    (
-      cli::cli_abort('variable "{variable}" is not found in the data')
-    )
+    cli::cli_abort('variable "{variable}" is not found in the data')
   }
   return(variable)
 }
@@ -377,6 +382,3 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
   x_ns <- agg_klas[klas[ns], 2]
   return(x_ns)
 }
-
-
-
