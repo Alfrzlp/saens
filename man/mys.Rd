@@ -15,6 +15,7 @@ A data frame with 42 rows and 7 variables :
   \item{x1}{Number of Elementary Schools}
   \item{x2}{Number of Junior High Schools}
   \item{x3}{Number of Senior High Schools}
+  \item{clust}{Cluster}
 }
 }
 \source{

@@ -87,7 +87,6 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
   } else {
     # Extract vardir and cluster
     clust <- .get_variable(data, cluster)
-
     if (any(is.na(clust))) {
       cli::cli_abort("cluster variable contains NA values.")
     }
@@ -245,6 +244,7 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
   Xbeta <- X %*% BETA
   resid <- y - Xbeta
   u <- (sigma2_u / (sigma2_u + vardir)) * resid
+  u <- as.vector(u)
   eblup_est <- Xbeta + u
 
   # Goodness ------------------------------
@@ -367,6 +367,8 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
   } else if (methods::is(variable, "character")) {
     if (variable %in% colnames(data)) {
       variable <- data[[variable]]
+    }else{
+      cli::cli_abort('variable "{variable}" is not found in the data')
     }
   } else if (methods::is(variable, "formula")) {
     # extract column name (class character) from formula
@@ -379,6 +381,9 @@ eblupfh <- function(formula, data, vardir, cluster, method = "REML",
 
 .get_value <- function(x, klas, ns, fun = mean) {
   agg_klas <- stats::aggregate(x, list(klas[!ns]), FUN = fun, na.rm = TRUE)
-  x_ns <- agg_klas[klas[ns], 2]
+  x_ns <- dplyr::left_join(
+    data.frame(Group.1 = klas[ns]) ,
+    agg_klas, by = 'Group.1'
+  )$x
   return(x_ns)
 }

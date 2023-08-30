@@ -13,6 +13,7 @@
 #'   \item{x1}{Number of Elementary Schools}
 #'   \item{x2}{Number of Junior High Schools}
 #'   \item{x3}{Number of Senior High Schools}
+#'   \item{clust}{Cluster}
 #' }
 #' @source \url{https://bps.go.id}
 "mys"
