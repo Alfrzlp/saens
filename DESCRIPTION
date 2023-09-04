@@ -1,11 +1,10 @@
 Package: saens
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Small Area Estimation (sae) for Non-sampled Areas
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Author: Ridson Al Farizal P
+Maintainer: The package maintainer <ridsonalfarizal15@gmail.com>
+Description: Provides several functions for area level of small area estimation for non sampled areas using cluster information.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -20,3 +19,5 @@ Imports:
     rlang,
     stats,
     tidyr
+depends:
+    ggplot2
