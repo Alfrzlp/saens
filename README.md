@@ -19,7 +19,8 @@ Ridson Al Farizal P <alfrzlp@gmail.com>
 
 ## Description
 
-The goal of saens is to …
+This package is provide several functions for area level of small area
+estimation for non sampled areas using cluster information.
 
 ## Installation
 
