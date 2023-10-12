@@ -1,7 +1,6 @@
 #' Autoplot EBLUP results
 #'
 #' @param model EBLUP model
-#' @param variable variable to plot
 #' @param ... further arguments passed to or from other methods.
 #'
 #' @examples
@@ -15,7 +14,7 @@
 #' @importFrom ggplot2 ggplot aes geom_line scale_color_manual theme labs element_text autoplot
 #'
 #' @export
-autoplot.eblupres <- function(model, variable = 'RSE', ...){
+autoplot.eblupres <- function(model, ...){
   fit <- model$fit
   model <- model$df_res
   y <- model$y
