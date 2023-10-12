@@ -1,0 +1,115 @@
+---
+output: github_document
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# saens
+
+<!-- badges: start -->
+
+[![CRAN status](https://www.r-pkg.org/badges/version/saens)](https://CRAN.R-project.org/package=saens) [![R-CMD-check](https://github.com/Alfrzlp/saens/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Alfrzlp/saens/actions/workflows/R-CMD-check.yaml)
+
+<!-- badges: end -->
+
+## Author
+
+Ridson Al Farizal P, Azka Ubaidillah
+
+## Maintainer
+
+Ridson Al Farizal P [alfrzlp\@gmail.com](mailto:alfrzlp@gmail.com){.email}
+
+## Description
+
+The goal of saens is to ...
+
+## Installation
+
+You can install the development version of saens from [GitHub](https://github.com/) with:
+
+```{r, eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("Alfrzlp/saens")
+```
+
+or you can install cran version
+
+```{r, eval=FALSE}
+install.packages(saens)
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example, message=FALSE}
+library(saens)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+```{r cars}
+glimpse(mys)
+```
+
+### EBLUP Model
+
+```{r}
+m1 <- eblupfh(y ~ x1 + x2 + x3, data = mys, vardir = "var", cluster = "clust")
+```
+
+### Comparison of estimates and RSE
+
+```{r}
+mys$eblup_est <- m1$df_res$eblup
+mys$eblup_rse <- m1$df_res$rse
+  
+glimpse(mys)
+```
+
+```{r}
+mys %>% 
+  select(area, rse, eblup_rse) %>% 
+  pivot_longer(-1, names_to = "metode", values_to = "rse") %>%
+  ggplot(aes(x = area, y = rse, col = metode)) +
+  geom_line() +
+    scale_color_discrete(
+    labels = c('EBLUP', 'Direct Estimate')
+  ) +
+  labs(col = NULL, y = 'Estimate', x = 'Domain', title = 'Comparison of RSE') +
+  theme(
+    legend.position = 'bottom',
+    text = element_text(family = 'poppins'),
+    axis.ticks.x = element_blank(),
+    plot.title = element_text(face = 2, vjust = 0),
+    plot.subtitle = element_text(colour = 'gray30', vjust = 0)
+  )
+```
+
+```{r}
+mys %>% 
+  select(area, y, eblup_est) %>% 
+  pivot_longer(-1, names_to = "metode", values_to = "rse") %>%
+  ggplot(aes(x = area, y = rse, col = metode)) +
+  geom_line() +
+    scale_color_discrete(
+    labels = c('EBLUP', 'Direct Estimate')
+  ) +
+  labs(col = NULL, y = 'Estimate', x = 'Domain', title = 'Comparison of Estimates') +
+  theme(
+    legend.position = 'bottom',
+    text = element_text(family = 'poppins'),
+    axis.ticks.x = element_blank(),
+    plot.title = element_text(face = 2, vjust = 0),
+    plot.subtitle = element_text(colour = 'gray30', vjust = 0)
+  )
+```
