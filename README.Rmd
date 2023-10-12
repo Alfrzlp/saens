@@ -50,11 +50,15 @@ install.packages(saens)
 
 This is a basic example which shows you how to solve a common problem:
 
-```{r example, message=FALSE}
+```{r example, message=FALSE, warning=FALSE}
 library(saens)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+
+windowsFonts(
+  poppins = windowsFont('poppins')
+)
 ```
 
 ```{r cars}
@@ -76,7 +80,7 @@ mys$eblup_rse <- m1$df_res$rse
 glimpse(mys)
 ```
 
-```{r}
+```{r, dpi=500, fig.height=3, fig.width=7}
 mys %>% 
   select(area, rse, eblup_rse) %>% 
   pivot_longer(-1, names_to = "metode", values_to = "rse") %>%
@@ -95,7 +99,7 @@ mys %>%
   )
 ```
 
-```{r}
+```{r, dpi=500, fig.height=3, fig.width=7}
 mys %>% 
   select(area, y, eblup_est) %>% 
   pivot_longer(-1, names_to = "metode", values_to = "rse") %>%
