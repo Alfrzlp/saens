@@ -1,7 +1,9 @@
 #' Autoplot EBLUP results
 #'
-#' @param model EBLUP model
+#' @param object EBLUP model
+#' @param variable variable to plot
 #' @param ... further arguments passed to or from other methods.
+#' @return plot
 #'
 #' @examples
 #' library(saens)
@@ -14,32 +16,32 @@
 #' @importFrom ggplot2 ggplot aes geom_line scale_color_manual theme labs element_text autoplot
 #'
 #' @export
-autoplot.eblupres <- function(model, ...){
-  fit <- model$fit
-  model <- model$df_res
-  y <- model$y
+autoplot.eblupres <- function(object, variable = 'RSE', ...){
+  fit <- object$fit
+  object <- object$df_res
+  y <- object$y
 
   variable <- match.arg(toupper(variable), c('RSE', 'RRMSE', 'MSE', 'EBLUP'))
   if (variable %in% c('RSE', 'RRMSE')) {
     ytitle <- 'RRMSE'
     df_res <- data.frame(
       area = 1:length(y),
-      rse = sqrt(model$vardir) * 100 / y,
-      rse_eblup = sqrt(model$mse) * 100 / model$eblup
+      rse = sqrt(object$vardir) * 100 / y,
+      rse_eblup = sqrt(object$mse) * 100 / object$eblup
     )
   }else if (variable == 'MSE') {
     ytitle <- 'MSE'
     df_res <- data.frame(
       area = 1:length(y),
-      mse = model$vardir,
-      mse_eblup = model$mse
+      mse = object$vardir,
+      mse_eblup = object$mse
     )
   }else if (variable == 'EBLUP') {
     ytitle <- all.vars(fit$model_formula)[1]
     df_res <- data.frame(
       area = 1:length(y),
       direct = y,
-      eblup_est = model$eblup
+      eblup_est = object$eblup
     )
   }
   df_res <- tidyr::pivot_longer(df_res, -.data$area)
@@ -62,3 +64,6 @@ autoplot.eblupres <- function(model, ...){
       plot.subtitle = element_text(colour = 'gray30', vjust = 0)
     )
 }
+
+
+

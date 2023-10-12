@@ -4,14 +4,17 @@
 \alias{autoplot.eblupres}
 \title{Autoplot EBLUP results}
 \usage{
-\method{autoplot}{eblupres}(model, variable = "RSE", ...)
+\method{autoplot}{eblupres}(object, variable = "RSE", ...)
 }
 \arguments{
-\item{model}{EBLUP model}
+\item{object}{EBLUP model}
 
 \item{variable}{variable to plot}
 
 \item{...}{further arguments passed to or from other methods.}
+}
+\value{
+plot
 }
 \description{
 Autoplot EBLUP results
